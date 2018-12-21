@@ -1,0 +1,153 @@
+'use strict';
+const mongo = require('../helper_functions/mongo');
+const logic = require('../helper_functions/logic');
+const koeln = require('../helper_functions/koeln');
+const phonem = require('talisman/phonetics/german/phonem');
+const query_mongo = require('../helper_functions/query_mongo');
+
+const NewContactIntentHandler = { //Noch Raumnummer und Abteilung unso einfügen, dass man unterscheiden kann wenn Doppelte gibt.
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NewContactIntent';
+    },
+    handle(handlerInput) {
+
+        const request = handlerInput.requestEnvelope.request;
+        const currentIntent = handlerInput.requestEnvelope.request.intent;
+        var firstName = currentIntent.slots.FirstName.value;
+        var lastName = currentIntent.slots.UserInputLastName.value;
+        var companyName = currentIntent.slots.CompanyName.value;
+        var mobileNum = currentIntent.slots.MobileNum.value;
+        var emailAddress = currentIntent.slots.UserInputEmail.value;
+
+        if (request.dialogState !== 'COMPLETED') {
+            return handlerInput.responseBuilder
+                .addDelegateDirective(currentIntent)
+                .getResponse();
+        } else {
+            if (!currentIntent.slots.EmailSurrogate.value) {
+                lastName = logic.concatName(lastName);
+                emailAddress = logic.replaceEmailSymbols(emailAddress);
+                emailAddress = logic.replaceEmailNames(emailAddress, firstName, lastName, companyName);
+            } else {
+                lastName = logic.concatName(lastName);
+                emailAddress = logic.replaceEmailSymbols(emailAddress);
+            }
+
+            mobileNum = logic.replaceNumberLiterals(mobileNum);
+            var data = {
+                cologne: { first: koeln(firstName), last: koeln(lastName) }, phonem: { first: phonem(firstName), last: phonem(lastName) },
+                "firstName": firstName, "lastName": lastName, "companyName": companyName, "mobileNum": mobileNum, "email": emailAddress
+            };
+            mongo.insertIntoMongo(data, 'Contacts');
+            const speechText = 'Ok ich habe ' + firstName + ' ' + lastName + ' hinzugefügt. Kann ich noch was für dich tun?';
+
+            return handlerInput.responseBuilder
+                .speak(speechText)
+                .reprompt(speechText)
+                .withShouldEndSession(false)
+                .getResponse();
+        }
+
+    }
+};
+
+const NewAppointmentIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NewAppointmentIntent';
+    },
+    handle(handlerInput) {
+
+        const userId = handlerInput.requestEnvelope.session.user.userId;
+        const request = handlerInput.requestEnvelope.request;
+        const currentIntent = handlerInput.requestEnvelope.request.intent;
+        var name = currentIntent.slots.AppointmentName.value;
+        var date = currentIntent.slots.AppointmentDate.value;
+        var startTime = currentIntent.slots.AppointmentStartTime.value;
+        var endTime = currentIntent.slots.AppointmentEndTime.value;
+        var place = currentIntent.slots.AppointmentPlace.value;
+        var description = currentIntent.slots.AppointmentDescription.value;
+
+        /* wenn ich nicht completed bin delegate ich ganz normal.
+        Wenn ich an einer abzweigung bin handle ich manuell.
+        am ende ein einzelnes if wenn status completed ist */
+
+        if (request.dialogState !== 'COMPLETED') {
+            return handlerInput.responseBuilder
+                .addDelegateDirective(currentIntent)
+                .getResponse();
+        } else {
+            var data = { "userId": userId, "name": name, "date": date, "startTime": startTime, "endTime": endTime, "place": place, "description": description };
+            mongo.insertIntoMongo(data, 'Appointments');
+
+            const speechText = 'Ok ich habe den Termin' + name + ' am ' + date + ' von ' + startTime + ' bis ' + endTime + ' hinzugefügt. Kann ich noch was für dich tun?';
+
+            return handlerInput.responseBuilder
+                .speak(speechText)
+                .reprompt(speechText)
+                .withShouldEndSession(false)
+                .getResponse();
+        }
+
+    }
+};
+
+const EditEntryIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'EditEntryIntent';
+    },
+    async handle(handlerInput) {
+        let sessionattributes = handlerInput.attributesManager.getSessionAttributes();
+        const request = handlerInput.requestEnvelope.request;
+        const currentIntent = handlerInput.requestEnvelope.request.intent;
+        let speechText = '';
+        const companyName = logic.getSlotValue(handlerInput, 'EditEntryIntentCorporation');
+        const entryPropertyValue = parseInt(logic.getSlotValue(handlerInput, 'EditEntryIntentValue'));
+        const entryPropertyName = logic.getSlotValue(handlerInput, 'EditEntryIntentProperty');
+        const entryPropertyID = logic.getSlotID(handlerInput, 'EditEntryIntentProperty');
+        const entryProperty = { name: entryPropertyName, id: entryPropertyID, value: entryPropertyValue };
+
+
+        if (entryPropertyID && companyName && entryPropertyValue) {
+            try {
+                const result = await query_mongo.queryMongoDB({ name: companyName }, 'Opportunities');
+                if (result.length === 0 || logic.isEmpty(result[0])) speechText = `Ich habe zu ${companyName} keinen Eintrag gefunden.`
+                else {
+                    const query = logic.calcOpportunityValues(entryProperty, result[0]);
+                    const newResult = await query_mongo.queryAndUpdate(query, 'Opportunities');
+                    console.log(JSON.stringify(newResult));
+                    speechText = `Der neue Wert beträgt jetzt ${entryPropertyValue}.`;
+                }
+                speechText += ' Kann ich noch was für dich tun?'
+            } catch (error) {
+                speechText = 'Tut mir leid, es ist ein Fehler aufgetreten. Bitte versuche es später nochmal.'
+                console.log(`Intent: ${handlerInput.requestEnvelope.request.intent.name}: message: ${error.message}`);
+            }
+        } else {
+            speechText = 'Tut mir leid, das habe ich nicht verstanden. Bitte wiederhole es nochmal.'
+        }
+
+        //handlerInput.attributesManager.setSessionAttributes(sessionattributes);
+
+        if (request.dialogState !== 'COMPLETED') {
+            return handlerInput.responseBuilder
+                .addDelegateDirective(currentIntent)
+                .getResponse();
+        } else {
+
+            return handlerInput.responseBuilder
+                .speak(speechText)
+                .reprompt(speechText)
+                .withShouldEndSession(false)
+                .getResponse();
+        }
+    }
+};
+
+module.exports = {
+    NewContactIntentHandler,
+    NewAppointmentIntentHandler,
+    EditEntryIntentHandler
+}
