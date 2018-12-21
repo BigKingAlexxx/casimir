@@ -102,7 +102,7 @@ const QuerySalaryIntentHandler = {
         } else {
             try {
                 const result = await query_mongo.queryInfoEmployee(firstName, lastName, object);
-                if (result.result.length == 0 || isEmpty(result.result[0])) {
+                if (result.result.length == 0 || logic.isEmpty(result.result[0])) {
                     console.log("result ist MT")
                     speechText = result.speechText;
                 } else if (result.many) {
