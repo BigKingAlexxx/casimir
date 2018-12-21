@@ -14,6 +14,7 @@ const QueryPhoneIntentHandler = {
         const lastName = logic.getSlotValue(handlerInput, 'QueryPhoneIntentLastName');
         let personID = logic.getSlotValue(handlerInput, 'PersonID');
         let sessionattributes = handlerInput.attributesManager.getSessionAttributes();
+        if (!sessionattributes.hasOwnProperty('LastIntent')) sessionattributes.LastIntent = currentIntent;
         let speechText = '';
         const object = 'phone';
 
@@ -43,7 +44,7 @@ const QueryPhoneIntentHandler = {
                     speechText = result.speechText;
                 } else if (result.many) {
                     speechText = result.speechText;
-                    sessionattributes.LastIntent = { result: result.result };
+                    sessionattributes.LastIntent = {result: result.result};
                     handlerInput.attributesManager.setSessionAttributes(sessionattributes);
                     return handlerInput.responseBuilder
                         .addElicitSlotDirective('PersonID')
@@ -77,13 +78,15 @@ const QuerySalaryIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === 'QuerySalaryIntent';
     },
     async handle(handlerInput) {
+        const currentIntent = handlerInput.requestEnvelope.request.intent;
         const firstName = logic.getSlotValue(handlerInput, 'QuerySalaryIntentFirstName');
         const lastName = logic.getSlotValue(handlerInput, 'QuerySalaryIntentLastName');
         let personID = logic.getSlotValue(handlerInput, 'PersonID');
         let sessionattributes = handlerInput.attributesManager.getSessionAttributes();
+        sessionattributes.LastIntent = currentIntent;
         let speechText = '';
         const object = 'salary';
-        console.log(firstName + " " + lastName)
+
         if (personID !== '') {
             let result = sessionattributes.LastIntent.result;
             personID = logic.replaceNumberLiterals(personID);
@@ -107,7 +110,7 @@ const QuerySalaryIntentHandler = {
                     speechText = result.speechText;
                 } else if (result.many) {
                     speechText = result.speechText;
-                    sessionattributes.LastIntent = { result: result.result };
+                    sessionattributes.LastIntent = {result: result.result};
                     handlerInput.attributesManager.setSessionAttributes(sessionattributes);
                     return handlerInput.responseBuilder
                         .addElicitSlotDirective('PersonID')
@@ -123,6 +126,10 @@ const QuerySalaryIntentHandler = {
             }
         }
 
+        sessionattributes.LastIntent.name = 'QuerySalaryIntent';
+        sessionattributes.LastIntent.speechText = speechText;
+        handlerInput.attributesManager.setSessionAttributes(sessionattributes);
+
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -137,6 +144,7 @@ const QueryDateOfJoiningIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === 'QueryDateOfJoiningIntent';
     },
     async handle(handlerInput) {
+        const currentIntent = handlerInput.requestEnvelope.request.intent;
         const firstName = logic.getSlotValue(handlerInput, 'QueryDateOfJoiningIntentFirstName');
         const lastName = logic.getSlotValue(handlerInput, 'QueryDateOfJoiningIntentLastName');
         let personID = logic.getSlotValue(handlerInput, 'PersonID');
@@ -162,11 +170,11 @@ const QueryDateOfJoiningIntentHandler = {
         } else {
             try {
                 const result = await query_mongo.queryInfoEmployee(firstName, lastName, object);
-                if (result.result.length == 0 || isEmpty(result.result[0])) {
+                if (result.result.length == 0 || logic.isEmpty(result.result[0])) {
                     speechText = result.speechText;
                 } else if (result.many) {
                     speechText = result.speechText;
-                    sessionattributes.LastIntent = { result: result.result };
+                    sessionattributes.LastIntent = {result: result.result};
                     handlerInput.attributesManager.setSessionAttributes(sessionattributes);
                     return handlerInput.responseBuilder
                         .addElicitSlotDirective('PersonID')
@@ -182,6 +190,10 @@ const QueryDateOfJoiningIntentHandler = {
             }
         }
 
+        sessionattributes.LastIntent.name = 'QueryDateOfJoiningIntent';
+        sessionattributes.LastIntent.speechText = speechText;
+        handlerInput.attributesManager.setSessionAttributes(sessionattributes);
+
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -196,10 +208,12 @@ const QueryEmailIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === 'QueryEmailIntent';
     },
     async handle(handlerInput) {
+        const currentIntent = handlerInput.requestEnvelope.request.intent;
         const firstName = logic.getSlotValue(handlerInput, 'QueryEmailIntentFirstName');
         const lastName = logic.getSlotValue(handlerInput, 'QueryEmailIntentLastName');
         let personID = logic.getSlotValue(handlerInput, 'PersonID');
         let sessionattributes = handlerInput.attributesManager.getSessionAttributes();
+        if (!sessionattributes.hasOwnProperty('LastIntent')) sessionattributes.LastIntent = currentIntent;
         let speechText = '';
         const object = 'email';
 
@@ -229,7 +243,7 @@ const QueryEmailIntentHandler = {
                     speechText = result.speechText;
                 } else if (result.many) {
                     speechText = result.speechText;
-                    sessionattributes.LastIntent = { result: result.result };
+                    sessionattributes.LastIntent = {result: result.result};
                     handlerInput.attributesManager.setSessionAttributes(sessionattributes);
                     return handlerInput.responseBuilder
                         .addElicitSlotDirective('PersonID')
@@ -245,6 +259,10 @@ const QueryEmailIntentHandler = {
             }
         }
 
+        sessionattributes.LastIntent.name = 'QueryEmailIntent';
+        sessionattributes.LastIntent.speechText = speechText;
+        handlerInput.attributesManager.setSessionAttributes(sessionattributes);
+
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -259,10 +277,12 @@ const QueryInfoEmployeeIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === 'QueryInfoEmployeeIntent';
     },
     async handle(handlerInput) {
+        const currentIntent = handlerInput.requestEnvelope.request.intent;
         const firstName = logic.getSlotValue(handlerInput, 'QueryInfoEmployeeIntentFirstName');
         const lastName = logic.getSlotValue(handlerInput, 'QueryInfoEmployeeIntentLastName');
         let personID = logic.getSlotValue(handlerInput, 'PersonID');
         let sessionattributes = handlerInput.attributesManager.getSessionAttributes();
+        //if (!personID) sessionattributes.LastIntent = currentIntent;
         let speechText = '';
 
         if (personID !== '') {
@@ -287,7 +307,7 @@ const QueryInfoEmployeeIntentHandler = {
                     speechText = result.speechText;
                 } else if (result.many) {
                     speechText = result.speechText;
-                    sessionattributes.LastIntent = { result: result.result };
+                    sessionattributes.LastIntent = {result: result.result};
                     handlerInput.attributesManager.setSessionAttributes(sessionattributes);
                     return handlerInput.responseBuilder
                         .addElicitSlotDirective('PersonID')
@@ -302,6 +322,11 @@ const QueryInfoEmployeeIntentHandler = {
                 console.log(`Intent: ${handlerInput.requestEnvelope.request.intent.name}: message: ${error.message}`);
             }
         }
+
+        sessionattributes.LastIntent = currentIntent;
+        sessionattributes.LastIntent.name = 'QueryInfoEmployeeIntent';
+        sessionattributes.LastIntent.speechText = speechText;
+        handlerInput.attributesManager.setSessionAttributes(sessionattributes);
 
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -340,15 +365,13 @@ const QueryAppointmentIntentHandler = {
                     if (result.length === 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ein Termin. `;
                     else if (result.length > 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ${result.length} Termine. `;
                 }
-            }
-            else if (date) {
+            } else if (date) {
                 result = await query_mongo.queryAppointment(userId, date);
                 if (!(sessionattributes.hasOwnProperty('LastIntent'))) {
                     if (result.length === 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ein Termin. `;
                     else if (result.length > 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ${result.length} Termine. `;
                 }
-            }
-            else result = await query_mongo.queryAppointment(userId);
+            } else result = await query_mongo.queryAppointment(userId);
 
             if (result.length == 0 || logic.isEmpty(result[0])) { // https://en.wiktionary.org/wiki/Wiktionary:Main_Page --> für Phoneme
                 speechText = 'Tut mir leid, ich konnte zu deiner Benutzer-<phoneme alphabet="ipa" ph="aɪˈdiː">ID</phoneme> keine Termine finden.';
@@ -380,7 +403,7 @@ const QueryAppointmentIntentHandler = {
                         speechText += ` Du hast noch ${result.length - (amountDone + 1)} weitere Termine. Soll ich weiter machen?`
                         sessionattributes.LastIntent = currentIntent;
                         sessionattributes.LastIntent.name = 'QueryAppointmentIntent';
-                        sessionattributes.LastIntent.appointment = { 'result': result, 'amountDone': amountDone + 1 };
+                        sessionattributes.LastIntent.appointment = {'result': result, 'amountDone': amountDone + 1};
                         sessionattributes.LastIntent.NoMoreInfo = false;
                         handlerInput.attributesManager.setSessionAttributes(sessionattributes);
                         return handlerInput.responseBuilder
@@ -522,10 +545,10 @@ const QueryProjectIntentHandler = {
     }
 };
 
-const QueryNotesIntentHandler = {
+const QueryNoteIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'QueryNotesIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'QueryNoteIntent';
     },
     handle(handlerInput) {
         let sessionattributes = handlerInput.attributesManager.getSessionAttributes();
@@ -538,7 +561,6 @@ const QueryNotesIntentHandler = {
             let amountDone = sessionattributes.LastIntent.amountDone;
             speechText = `Die Notiz zum Projekt ${result[amountDone - 1].name} ist: ${result[amountDone - 1].notes}`;
         }
-        speechText += " Kann ich noch was für dich tun?"
 
         //handlerInput.attributesManager.setSessionAttributes(sessionattributes);
         return handlerInput.responseBuilder
@@ -588,12 +610,13 @@ const MoreInfoIntentHandler = {
                     if (i.customer_name !== 'intern') {
                         speechText += `Das Projekt <emphasis>${i.name}</emphasis> wurde von ${i.customer_name} in Auftrag gegeben. Der Projektleiter ist ${i.project_manager}. ` +
                             `Die Deadline wird in ${logic.getDaysDiff(new Date(), i.end)} Tagen, am ${i.end} erreicht. Das Budget beträgt ${i.budget.total} ${i.budget.currency}, ` +
-                            `davon bleiben noch ${i.budget.left} ${i.budget.currency}. An dem Projekt arbeiten ${i.number_of_employees} Mitarbeiter und die zuständige Abteilung ist ${i.department}. `;
-                    }
-                    else {
+                            `davon bleiben noch ${i.budget.left} ${i.budget.currency}. An dem Projekt arbeiten ${i.number_of_employees} Mitarbeiter und die zuständige Abteilung ist ` +
+                            `${i.department}. `;
+                    } else {
                         speechText += `Das Projekt <emphasis>${i.name}</emphasis> ist ein internes Projekt. Der Projektleiter ist ${i.project_manager}. ` +
                             `Die Deadline wird in ${logic.getDaysDiff(new Date(), i.end)} Tagen, am ${i.end} erreicht. Das Budget beträgt ${i.budget.total} ${i.budget.currency}, ` +
-                            `davon bleiben noch ${i.budget.left} ${i.budget.currency}. An dem Projekt arbeiten ${i.number_of_employees} Mitarbeiter und die zuständige Abteilung ist ${i.department}. `;
+                            `davon bleiben noch ${i.budget.left} ${i.budget.currency}. An dem Projekt arbeiten ${i.number_of_employees} Mitarbeiter und die zuständige Abteilung ist ` +
+                            `${i.department}. `;
                     }
                 } else speechText = `${number} liegt außerhalb des zulässigen Bereichs. Bitte wähle zwischen 1 und <say-as interpret-as='cardinal'>${result.length}</say-as>. `;
             } else {
@@ -603,12 +626,13 @@ const MoreInfoIntentHandler = {
                     if (i.customer_name !== 'intern') {
                         speechText += `Das Projekt <emphasis>${i.name}</emphasis> wurde von ${i.customer_name} in Auftrag gegeben. Der Projektleiter ist ${i.project_manager}. ` +
                             `Die Deadline wird in ${logic.getDaysDiff(new Date(), i.end)} Tagen, am ${i.end} erreicht. Das Budget beträgt ${i.budget.total} ${i.budget.currency}, ` +
-                            `davon bleiben noch ${i.budget.left} ${i.budget.currency}. An dem Projekt arbeiten ${i.number_of_employees} Mitarbeiter und die zuständige Abteilung ist ${i.department}. `;
-                    }
-                    else {
+                            `davon bleiben noch ${i.budget.left} ${i.budget.currency}. An dem Projekt arbeiten ${i.number_of_employees} Mitarbeiter und die zuständige Abteilung ist ` +
+                            `${i.department}. `;
+                    } else {
                         speechText += `Das Projekt <emphasis>${i.name}</emphasis> ist ein internes Projekt. Der Projektleiter ist ${i.project_manager}. ` +
                             `Die Deadline wird in ${logic.getDaysDiff(new Date(), i.end)} Tagen, am ${i.end} erreicht. Das Budget beträgt ${i.budget.total} ${i.budget.currency}, ` +
-                            `davon bleiben noch ${i.budget.left} ${i.budget.currency}. An dem Projekt arbeiten ${i.number_of_employees} Mitarbeiter und die zuständige Abteilung ist ${i.department}. `;
+                            `davon bleiben noch ${i.budget.left} ${i.budget.currency}. An dem Projekt arbeiten ${i.number_of_employees} Mitarbeiter und die zuständige Abteilung ist ` +
+                            `${i.department}. `;
                     }
                     if (sessionattributes.LastIntent.amountDone !== result.length - 1) {
                         //sessionattributes.LastIntent = currentIntent;
@@ -651,6 +675,6 @@ module.exports = {
     QueryAppointmentIntentHandler,
     QueryCustomersAggregateIntentHandler,
     QueryProjectIntentHandler,
-    QueryNotesIntentHandler,
+    QueryNoteIntentHandler,
     MoreInfoIntentHandler
 }

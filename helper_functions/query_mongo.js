@@ -4,6 +4,7 @@ const koeln = require('../helper_functions/koeln');
 const similarity = require('string-similarity');
 const phonem = require('talisman/phonetics/german/phonem');
 const Promise = require('promise');
+const speech = require("./speech_text");
 const MongoClient = require('mongodb').MongoClient;
 const urlOnline = { connectionString: "mongodb://admin:Software1@18.203.81.194:27017/admin", options: { useNewUrlParser: true } };
 
@@ -20,7 +21,7 @@ function queryInfoEmployee(firstName, lastName, object) {
                     }
                     let speechText = '';
                     let returnObject = { result: result, speechText: speechText, many: false };
-                    if (result.length == 0 || isEmpty(result[0])) {
+                    if (result.length == 0 || logic.isEmpty(result[0])) {
                         client.close();
                         returnObject.speechText = `Es tut mir leid, zu ${firstName} ${lastName} habe ich keine Informationen gefunden.`;
                         resolve(returnObject);
@@ -38,31 +39,31 @@ function queryInfoEmployee(firstName, lastName, object) {
 
                     } else {
                         if (object === 'salary') {
-                            speechText = getEmployeeSpeechText(object, result);
+                            speechText = speech.getEmployeeSpeechText(object, result);
                             returnObject.speechText = speechText;
                             client.close();
                             resolve(returnObject);
 
                         } else if (object === 'phone') {
-                            speechText = getEmployeeSpeechText(object, result);
+                            speechText = speech.getEmployeeSpeechText(object, result);
                             returnObject.speechText = speechText;
                             client.close();
                             resolve(returnObject);
 
                         } else if (object === 'date of joining') {
-                            speechText = getEmployeeSpeechText(object, result);
+                            speechText = speech.getEmployeeSpeechText(object, result);
                             returnObject.speechText = speechText;
                             client.close();
                             resolve(returnObject);
 
                         } else if (object === 'email') {
-                            speechText = getEmployeeSpeechText(object, result);
+                            speechText = speech.getEmployeeSpeechText(object, result);
                             returnObject.speechText = speechText;
                             client.close();
                             resolve(returnObject);
 
                         } else {
-                            speechText = getEmployeeSpeechText('allInfo', result);
+                            speechText = speech.getEmployeeSpeechText('allInfo', result);
                             console.log("Sprachtext: " + speechText);
                             returnObject.speechText = speechText;
                             client.close();
@@ -281,7 +282,7 @@ function queryTest(query) {
                     if (err) {
                         console.log(err);
                         reject(err);
-                    } else if (result.length == 0 || isEmpty(result[0])) {
+                    } else if (result.length == 0 || logic.isEmpty(result[0])) {
                         client.close();
                         resolve(false);
                     } else {

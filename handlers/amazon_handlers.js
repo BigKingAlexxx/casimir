@@ -1,4 +1,5 @@
 'use strict';
+const QueryHandlers = require('./query_handlers');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -23,15 +24,16 @@ const YesIntentHandler = {
         let speechText = '';
         if (sessionattributes.LastIntent !== undefined && !sessionattributes.LastIntent.NoMoreInfos) {
             if (sessionattributes.LastIntent.name === 'QueryAppointmentIntent') {
-                return QueryAppointmentIntentHandler.handle(handlerInput);
+                return QueryHandlers.QueryAppointmentIntentHandler.handle(handlerInput);
             }
             if (sessionattributes.LastIntent.name === 'QueryProjectIntent') { console.log("return MoreInfoIntentHandler.handle(handlerInput);")
-                return MoreInfoIntentHandler.handle(handlerInput);
+                return QueryHandlers.MoreInfoIntentHandler.handle(handlerInput);
             }
             if (sessionattributes.LastIntent.name === 'QueryPhoneIntent'
                 || sessionattributes.LastIntent.name === 'QuerySalaryIntent'
                 || sessionattributes.LastIntent.name === 'QueryDateOfJoiningIntent'
-                || sessionattributes.LastIntent.name === 'QueryEmailIntent') {
+                || sessionattributes.LastIntent.name === 'QueryEmailIntent'
+                || sessionattributes.LastIntent.name === 'QueryInfoEmployeeIntent') {
                 speechText = sessionattributes.LastIntent.speechText;
             }
         } else {

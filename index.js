@@ -15,6 +15,7 @@ const ErrorHandler = require("./handlers/amazon_handlers").ErrorHandler;
 const NewContactIntentHandler = require("./handlers/entry_handlers").NewContactIntentHandler;
 const NewAppointmentIntentHandler = require("./handlers/entry_handlers").NewAppointmentIntentHandler;
 const EditEntryIntentHandler = require("./handlers/entry_handlers").EditEntryIntentHandler;
+const AddNoteIntentHandler = require("./handlers/entry_handlers").AddNoteIntentHandler;
 
 const QueryPhoneIntentHandler = require("./handlers/query_handlers").QueryPhoneIntentHandler;
 const QuerySalaryIntentHandler = require("./handlers/query_handlers").QuerySalaryIntentHandler;
@@ -24,7 +25,7 @@ const QueryInfoEmployeeIntentHandler = require("./handlers/query_handlers").Quer
 const QueryAppointmentIntentHandler = require("./handlers/query_handlers").QueryAppointmentIntentHandler;
 const QueryCustomersAggregateIntentHandler = require("./handlers/query_handlers").QueryCustomersAggregateIntentHandler;
 const QueryProjectIntentHandler = require("./handlers/query_handlers").QueryProjectIntentHandler;
-const QueryNotesIntentHandler = require("./handlers/query_handlers").QueryNotesIntentHandler;
+const QueryNoteIntentHandler = require("./handlers/query_handlers").QueryNoteIntentHandler;
 const MoreInfoIntentHandler = require("./handlers/query_handlers").MoreInfoIntentHandler;
 
 const ZahlIntentHandler = require("./handlers/test_handlers").ZahlIntentHandler;
@@ -47,6 +48,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         NewContactIntentHandler,
         NewAppointmentIntentHandler,
         EditEntryIntentHandler,
+        AddNoteIntentHandler,
         QueryPhoneIntentHandler,
         QuerySalaryIntentHandler,
         QueryDateOfJoiningIntentHandler,
@@ -55,7 +57,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         QueryAppointmentIntentHandler,
         QueryCustomersAggregateIntentHandler,
         QueryProjectIntentHandler,
-        QueryNotesIntentHandler,
+        QueryNoteIntentHandler,
         MoreInfoIntentHandler,
         YesIntentHandler,
         NoIntentHandler,

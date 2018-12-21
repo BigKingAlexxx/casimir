@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "ask-sdk-core": "^2.3.0",
-    "ask-sdk-model": "^1.9.0",
+    "ask-sdk-model": "^1.11.1",
     "fast-levenshtein": "^2.0.6",
     "mongodb": "^3.1.10",
     "promise": "^8.0.2",

@@ -16,7 +16,7 @@ const NewContactIntentHandler = { //Noch Raumnummer und Abteilung unso einfügen
         const currentIntent = handlerInput.requestEnvelope.request.intent;
         var firstName = currentIntent.slots.FirstName.value;
         var lastName = currentIntent.slots.UserInputLastName.value;
-        var companyName = currentIntent.slots.CompanyName.value;
+        var companyName = logic.getSlotValue(handlerInput, 'CompanyName');//currentIntent.slots.CompanyName.value;
         var mobileNum = currentIntent.slots.MobileNum.value;
         var emailAddress = currentIntent.slots.UserInputEmail.value;
 
@@ -25,11 +25,11 @@ const NewContactIntentHandler = { //Noch Raumnummer und Abteilung unso einfügen
                 .addDelegateDirective(currentIntent)
                 .getResponse();
         } else {
-            if (!currentIntent.slots.EmailSurrogate.value) {
+            if (!currentIntent.slots.EmailSurrogate.value) { console.log("nicht email Surrogate")
                 lastName = logic.concatName(lastName);
                 emailAddress = logic.replaceEmailSymbols(emailAddress);
                 emailAddress = logic.replaceEmailNames(emailAddress, firstName, lastName, companyName);
-            } else {
+            } else { console.log("doch email Surrogate")
                 lastName = logic.concatName(lastName);
                 emailAddress = logic.replaceEmailSymbols(emailAddress);
             }
@@ -146,8 +146,36 @@ const EditEntryIntentHandler = {
     }
 };
 
+const AddNoteIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'AddNoteIntent';
+    },
+    handle(handlerInput) {
+        let sessionattributes = handlerInput.attributesManager.getSessionAttributes();
+        const request = handlerInput.requestEnvelope.request;
+        const currentIntent = handlerInput.requestEnvelope.request.intent;
+        const note = logic.getSlotValue(handlerInput, 'Note');
+        let speechText = '';
+
+        if (sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryProjectIntent') {
+            speechText = `Ok, ich habe die Notiz ${note} hinzugefügt.`;
+        }
+        speechText += " Kann ich noch was für dich tun?"
+
+        //handlerInput.attributesManager.setSessionAttributes(sessionattributes);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .withShouldEndSession(false)
+            .getResponse();
+
+    }
+};
+
 module.exports = {
     NewContactIntentHandler,
     NewAppointmentIntentHandler,
-    EditEntryIntentHandler
+    EditEntryIntentHandler,
+    AddNoteIntentHandler
 }
