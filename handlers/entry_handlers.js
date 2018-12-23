@@ -1,5 +1,4 @@
 'use strict';
-const mongo = require('../helper_functions/mongo');
 const logic = require('../helper_functions/logic');
 const koeln = require('../helper_functions/koeln');
 const phonem = require('talisman/phonetics/german/phonem');
@@ -39,7 +38,7 @@ const NewContactIntentHandler = { //Noch Raumnummer und Abteilung unso einfügen
                 cologne: { first: koeln(firstName), last: koeln(lastName) }, phonem: { first: phonem(firstName), last: phonem(lastName) },
                 "firstName": firstName, "lastName": lastName, "companyName": companyName, "mobileNum": mobileNum, "email": emailAddress
             };
-            mongo.insertIntoMongo(data, 'Contacts');
+            query_mongo.insertIntoMongo(data, 'Contacts');
             const speechText = 'Ok ich habe ' + firstName + ' ' + lastName + ' hinzugefügt. Kann ich noch was für dich tun?';
 
             return handlerInput.responseBuilder
@@ -79,7 +78,7 @@ const NewAppointmentIntentHandler = {
                 .getResponse();
         } else {
             var data = { "userId": userId, "name": name, "date": date, "startTime": startTime, "endTime": endTime, "place": place, "description": description };
-            mongo.insertIntoMongo(data, 'Appointments');
+            query_mongo.insertIntoMongo(data, 'Appointments');
 
             const speechText = 'Ok ich habe den Termin' + name + ' am ' + date + ' von ' + startTime + ' bis ' + endTime + ' hinzugefügt. Kann ich noch was für dich tun?';
 
@@ -155,10 +154,14 @@ const AddNoteIntentHandler = {
         let sessionattributes = handlerInput.attributesManager.getSessionAttributes();
         const request = handlerInput.requestEnvelope.request;
         const currentIntent = handlerInput.requestEnvelope.request.intent;
-        const note = logic.getSlotValue(handlerInput, 'Note');
+        let note = logic.getSlotValue(handlerInput, 'Note');
+        note = ' ' + note + '.';
         let speechText = '';
 
         if (sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryProjectIntent') {
+            const result = sessionattributes.LastIntent.result;
+            const amountDone = sessionattributes.LastIntent.amountDone;
+            query_mongo.updateNotes(result[amountDone - 1].name, note).then().catch(console.error);
             speechText = `Ok, ich habe die Notiz ${note} hinzugefügt.`;
         }
         speechText += " Kann ich noch was für dich tun?"

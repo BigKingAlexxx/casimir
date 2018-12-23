@@ -1,24 +1,15 @@
 'use strict';
 const Promise = require('promise');
 const MongoClient = require('mongodb').MongoClient;
-const urlOnline = { connectionString: "mongodb://admin:Software1@18.203.81.194:27017/admin", options: { useNewUrlParser: true } };
-
-function insertIntoMongo(data, collectionName) {
-    MongoClient.connect(urlOnline.connectionString, urlOnline.options, function (err, client) {
-        if (err) {
-            console.log(err);
-        } else {
-            var db = client.db('TestDB');
-            db.collection(collectionName).insert(data);
-            client.close();
-        }
-    });
-}
+const urlOnline = {
+    connectionString: "mongodb://admin:Software1@18.203.81.194:27017/admin",
+    options: {useNewUrlParser: true}
+};
 
 function findInMongo(field, document, collectionName) {
     return MongoClient.connect(urlOnline.connectionString, urlOnline.options).then(function (client) {
         var db = client.db('TestDB');
-        var data = db.collection(collectionName).find({ [field]: new RegExp('^' + document + '$', "i") }, { projection: { _id: 0 } }).toArray();
+        var data = db.collection(collectionName).find({[field]: new RegExp('^' + document + '$', "i")}, {projection: {_id: 0}}).toArray();
         client.close();
         return data;
     }).then(function (items) {
@@ -26,27 +17,29 @@ function findInMongo(field, document, collectionName) {
     });
 }
 
-function myPromise() {
+function testFunction(projectName, notes) {
     return new Promise(function (resolve, reject) {
         MongoClient.connect(urlOnline.connectionString, urlOnline.options, function (err, client) {
             if (err) reject(err);
             else {
                 var db = client.db('TestDB');
-                db.collection('Employees').find({ name: "Henrik Görlich" }, { projection: { _id: 0, telefon: 1 } }).toArray(function (err, result) {
+                db.collection('Projects').find({name: "Bachelor-Thesis"}, {projection: {}}).toArray(function (err, result) {
                     if (err) throw err;
-
-                    client.close();
-                    resolve(result);
+                    else {
+                        db.collection('Projects').updateOne({name: result[0].name}, {$set: {notes: result[0].notes + notes}}, function (err, result) {
+                            client.close();
+                            resolve(result);
+                        });
+                    }
                 });
             }
         });
     });
 }
 
+//testFunction('Bachelor-Thesis', ' Die Thesis wird bombe.').then(console.log()).catch(console.error);
+
 module.exports = {
-    insertIntoMongo,
-    findInMongo,
-    myPromise
 }
 
 /* function myPromise() {
@@ -183,7 +176,6 @@ const fs = require('fs');
 } */
 
 
-
 // Kundenname
 // number of licences
 // probability
@@ -249,7 +241,6 @@ queryName().then(console.log).catch(console.error); */
 }
 
 printAll(); */
-
 
 
 /* function query(query, collection) {
