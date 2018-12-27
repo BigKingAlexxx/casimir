@@ -49,7 +49,7 @@ function queryInfoEmployee(firstName, lastName, object) {
                     } else if (result.length > 1) {
                         speechText = `Unter diesem Namen habe ich mehrere Personen gefunden. Meinst du:`;
                         for (let i = 0; i < result.length; i++) {
-                            speechText += ` <say-as interpret-as='digits'>${i + 1}</say-as>: ${result[i].firstName} ${result[i].lastName}.`
+                            speechText += ` <say-as interpret-as='digits'>${i + 1}</say-as>: ${result[i].firstName} ${result[i].lastName}, Eintrittsdatum: ${result[i]['date of joining']}.`
                         }
                         speechText += ' Bitte wähle die zutreffende Zahl.'
                         returnObject.speechText = speechText;
@@ -305,27 +305,43 @@ async function findNames(firstName, lastName) {
 }
 
 function queryTest(query) {
-    return new Promise(function (resolve, reject) {
-        MongoClient.connect(urlOnline.connectionString, urlOnline.options, function (err, client) {
-            if (err) reject(err);
-            else {
-                var db = client.db('TestDB');
-                db.collection('Names').find(query, {projection: {_id: 0}}).toArray(function (err, result) {
-                    if (err) {
-                        console.log(err);
-                        reject(err);
-                    } else if (result.length == 0 || logic.isEmpty(result[0])) {
-                        client.close();
-                        resolve(false);
-                    } else {
-                        client.close();
-                        resolve(result);
-                    }
-                });
-            }
-        });
+    MongoClient.connect(urlOnline.connectionString, urlOnline.options, function (err, client) {
+        if (err) reject(err);
+        else {
+            let db = client.db('TestDB');
+            db.collection('Names').find(query, {projection: {_id: 0}}).toArray(function (err, result) {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                } else if (result.length == 0 || logic.isEmpty(result[0])) {
+                    client.close();
+                    resolve(false);
+                } else {
+                    client.close();
+                    resolve(result);
+                }
+            });
+        }
     });
 }
+
+/*function queryTest2() {
+    MongoClient.connect(urlOnline.connectionString, urlOnline.options)
+        .then(client =>
+            client.db("TestDB").collection("Names").find({firstName: "Alexander"}))
+        .then(data =>
+            console.log(data))
+        .catch(err =>
+            console.log(err));
+}
+
+queryTest2();
+
+queryTest({firstName: "Alexander"}).then(msg => {
+    console.log(msg);
+}).catch(err => {
+    console.log(err);
+});*/
 
 async function findAll(name) {
     let results = [];
