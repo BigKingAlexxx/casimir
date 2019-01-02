@@ -463,15 +463,19 @@ const QueryCustomersAggregateIntentHandler = {
             if (customerFeature === 'glücklich') {
                 speechText = speech.getSatisfactionSpeechText(result);
             } else if (startDate !== '' && endDate === '') {
-                console.log(startDate)
-                if (startDate.length !== 4) speechText = `Im ${logic.checkDateFormat(startDate)} wurden ${result.length} Kunden akquiriert.`;
-                else speechText = `In ${startDate} wurden ${result.length} Kunden akquiriert.`;
+                startDate = logic.checkDateFormat(startDate);
+                if (startDate.length === 4) speechText = `In ${startDate} wurden ${result.length} Kunden akquiriert.`;
+                else if (startDate.length === 7) speechText = `Im ${logic.getMonthLiteral(startDate) + " " + new Date(startDate).getFullYear()} wurden ${result.length} Kunden akquiriert.`;
+                else speechText = `Am ${startDate} wurden ${result.length} Kunden akquiriert.`;
                 for (let i of result) {
                     if (result.indexOf(i) + 1 === result.length) speechText += ` ${i.name}.`;
                     else speechText += ` ${i.name},`;
                 }
             } else if (startDate !== '' && endDate !== '') {
-                speechText = `Zwischen ${logic.checkDateFormat(startDate)} und ${logic.checkDateFormat(endDate)} wurden ${result.length} Kunden akquiriert.`;
+                startDate = logic.checkDateFormat(startDate);
+                endDate = logic.checkDateFormat(endDate);
+                if (startDate.length === 7) speechText = `Zwischen ${logic.getMonthLiteral(startDate) + " " + new Date(startDate).getFullYear()} und ${logic.getMonthLiteral(endDate) + " " + new Date(endDate).getFullYear()} wurden ${result.length} Kunden akquiriert.`;
+                else speechText = `Zwischen ${startDate} und ${endDate} wurden ${result.length} Kunden akquiriert.`;
                 for (let i of result) {
                     if (result.indexOf(i) + 1 === result.length) speechText += ` ${i.name}.`;
                     else speechText += ` ${i.name},`;

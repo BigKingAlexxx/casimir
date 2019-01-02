@@ -169,7 +169,7 @@ function queryCustomersAggregate(number, ranking, customerFeature, startDate, en
                     client.close();
                     resolve(Promise.all(promises));
                 } else if (startDate && endDate === '') {
-                    db.collection('Customers').find({
+                    /*db.collection('Customers').find({
                         $and: [{customer_since: {$gte: startDate + '-01'}},
                             {customer_since: {$lte: startDate + '-' + logic.getDaysInMonth(startDate)}}]
                     }, {projection: {}}).sort({customer_since: 1}).toArray(function (err, result) {
@@ -180,8 +180,25 @@ function queryCustomersAggregate(number, ranking, customerFeature, startDate, en
                             client.close();
                             resolve(result);
                         }
+                    });*/
+                    startDate = logic.checkDateFormat(startDate);
+                    db.collection('Customers').find({
+                        customer_since: new RegExp(startDate + '.*')
+                    }, {projection: {}}).sort({customer_since: 1}).toArray(function (err, result) {
+                        if (err) {
+                            console.log(err);
+                            reject(err);
+                        } else {
+                            console.log(startDate);
+                            console.log('/' + logic.checkDateFormat(startDate) + '.*/');
+                            console.log(JSON.stringify(result));
+                            client.close();
+                            resolve(result);
+                        }
                     });
                 } else if (startDate, endDate) {
+                    startDate = logic.checkDateFormat(startDate);
+                    endDate = logic.checkDateFormat(endDate);
                     db.collection('Customers').find({
                         $and: [{customer_since: {$gte: startDate + '-01'}},
                             {customer_since: {$lte: endDate + '-' + logic.getDaysInMonth(endDate)}}]
@@ -305,23 +322,25 @@ async function findNames(firstName, lastName) {
 }
 
 function queryTest(query) {
-    MongoClient.connect(urlOnline.connectionString, urlOnline.options, function (err, client) {
-        if (err) reject(err);
-        else {
-            let db = client.db('TestDB');
-            db.collection('Names').find(query, {projection: {_id: 0}}).toArray(function (err, result) {
-                if (err) {
-                    console.log(err);
-                    reject(err);
-                } else if (result.length == 0 || logic.isEmpty(result[0])) {
-                    client.close();
-                    resolve(false);
-                } else {
-                    client.close();
-                    resolve(result);
-                }
-            });
-        }
+    return new Promise(function (resolve, reject) {
+        MongoClient.connect(urlOnline.connectionString, urlOnline.options, function (err, client) {
+            if (err) reject(err);
+            else {
+                let db = client.db('TestDB');
+                db.collection('Names').find(query, {projection: {_id: 0}}).toArray(function (err, result) {
+                    if (err) {
+                        console.log(err);
+                        reject(err);
+                    } else if (result.length == 0 || logic.isEmpty(result[0])) {
+                        client.close();
+                        resolve(false);
+                    } else {
+                        client.close();
+                        resolve(result);
+                    }
+                });
+            }
+        });
     });
 }
 
@@ -363,7 +382,7 @@ function updateNotes(projectName, notes) {
             if (err) reject(err);
             else {
                 var db = client.db('TestDB');
-                db.collection('Projects').find({name: "Bachelor-Thesis"}, {projection: {}}).toArray(function (err, result) {
+                db.collection('Projects').find({name: projectName}, {projection: {}}).toArray(function (err, result) {
                     if (err) throw err;
                     else {
                         db.collection('Projects').updateOne({name: result[0].name}, {$set: {notes: result[0].notes + notes}}, function (err, result) {

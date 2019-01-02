@@ -199,7 +199,8 @@ function checkDateFormat(date) {
     if (date.length === 4) {
         return date;
     } else if (date.length === 7) {
-        return getMonthLiteral(date) + " " + new Date(date).getFullYear();
+        //return getMonthLiteral(date) + " " + new Date(date).getFullYear();
+        return date;
     } else if (date.length === 10 && !date.includes("X")) {
         return date;
     } else if (date.includes("W")) {
@@ -217,8 +218,6 @@ function checkDateFormat(date) {
 function getDaysDiff(date1, date2) {
     return convertMS((new Date(date2) - new Date(date1))).day;
 }
-
-console.log(getDaysDiff("2018-12-01", "2018-12-11"))
 
 function convertMS( milliseconds ) {
     var day, hour, minute, seconds;

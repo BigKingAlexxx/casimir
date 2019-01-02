@@ -26,8 +26,8 @@ const YesIntentHandler = {
             if (sessionattributes.LastIntent.name === 'QueryAppointmentIntent') {
                 return QueryHandlers.QueryAppointmentIntentHandler.handle(handlerInput);
             }
-            if (sessionattributes.LastIntent.name === 'QueryProjectIntent') { console.log("return MoreInfoIntentHandler.handle(handlerInput);")
-                return QueryHandlers.MoreInfoIntentHandler.handle(handlerInput);
+            if (sessionattributes.LastIntent.name === 'QueryProjectIntent') {
+                return QueryHandlers.MoreInfoIntentHandler.handle(handlerInput); // Kann ich hier sessionAttributes.LastIntent übergeben?
             }
             if (sessionattributes.LastIntent.name === 'QueryPhoneIntent'
                 || sessionattributes.LastIntent.name === 'QuerySalaryIntent'
