@@ -26,18 +26,19 @@ const YesIntentHandler = {
             if (sessionattributes.LastIntent.name === 'QueryAppointmentIntent') {
                 return QueryHandlers.QueryAppointmentIntentHandler.handle(handlerInput);
             }
-            if (sessionattributes.LastIntent.name === 'QueryProjectIntent') {
+            else if (sessionattributes.LastIntent.name === 'QueryProjectIntent') {
                 return QueryHandlers.MoreInfoIntentHandler.handle(handlerInput); // Kann ich hier sessionAttributes.LastIntent übergeben?
             }
-            if (sessionattributes.LastIntent.name === 'QueryPhoneIntent'
+            else if (sessionattributes.LastIntent.name === 'QueryPhoneIntent'
                 || sessionattributes.LastIntent.name === 'QuerySalaryIntent'
                 || sessionattributes.LastIntent.name === 'QueryDateOfJoiningIntent'
                 || sessionattributes.LastIntent.name === 'QueryEmailIntent'
                 || sessionattributes.LastIntent.name === 'QueryInfoEmployeeIntent') {
                 speechText = sessionattributes.LastIntent.speechText;
             }
+            else speechText = 'Ok, was möchtest du tun?'
         } else {
-            speechText = 'Ok, was möchtest du tun.';
+            speechText = 'Ok, was möchtest du tun?';
         }
 
         //handlerInput.attributesManager.setSessionAttributes(sessionattributes);

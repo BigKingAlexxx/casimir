@@ -601,9 +601,17 @@ const MoreInfoIntentHandler = {
 
         if (sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryCustomersAggregateIntent') {
             const result = sessionattributes.LastIntent.result;
-            for (let i of result) {
-                speechText += `${i.name} ist Kunde seit ${i.customer_since} und bezieht das Produkt ${i.product}. Der Umsatz beträgt ${i.revenue.value.$numberDecimal}` +
-                    ` ${i.revenue.currency} und der Kunde ist als ${i.satisfaction} eingestuft. Der Ansprechpartner ist ${i.contact.name}. `
+            if (category && number) {
+                number--;
+                let i = result[number];
+                speechText = `${i.name} ist Kunde seit ${i.customer_since} und bezieht das Produkt ${i.product}. Der Umsatz beträgt ${i.revenue.value.$numberDecimal}` +
+                    ` ${i.revenue.currency} und der Kunde ist als ${i.satisfaction} eingestuft. Der Ansprechpartner ist ${i.contact.name}. `;
+            }
+            else {
+                for (let i of result) {
+                    speechText += `${i.name} ist Kunde seit ${i.customer_since} und bezieht das Produkt ${i.product}. Der Umsatz beträgt ${i.revenue.value.$numberDecimal}` +
+                        ` ${i.revenue.currency} und der Kunde ist als ${i.satisfaction} eingestuft. Der Ansprechpartner ist ${i.contact.name}. `;
+                }
             }
             //sessionattributes.LastIntent = currentIntent;
         } else if (sessionattributes.hasOwnProperty('LastIntent') && (sessionattributes.LastIntent.name === 'QueryProjectIntent' || sessionattributes.LastIntent.name === 'MoreInfoIntent')) {
@@ -622,6 +630,7 @@ const MoreInfoIntentHandler = {
                             `davon bleiben noch ${i.budget.left} ${i.budget.currency}. An dem Projekt arbeiten ${i.number_of_employees} Mitarbeiter und die zuständige Abteilung ist ` +
                             `${i.department}. `;
                     }
+                    sessionattributes.LastIntent.NoMoreInfos = true;
                 } else speechText = `${number} liegt außerhalb des zulässigen Bereichs. Bitte wähle zwischen 1 und <say-as interpret-as='cardinal'>${result.length}</say-as>. `;
             } else {
                 let amountDone = sessionattributes.LastIntent.amountDone;
