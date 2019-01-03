@@ -91,8 +91,6 @@ function replaceNumberLiterals(string) {
     return result;
 }
 
-console.log(replaceNumberLiterals("null eins sieben sechs acht drei und dreißig sechs und vierzig neun vier sechs fünf hundert ein tausend"));
-
 function getWordCount(string) {
     return string.split(" ").length;
 }
@@ -124,7 +122,7 @@ function getWeekDay(date) {
 }
 
 function getNextDayOfWeekDate(dayOfWeek) {
-    let d = weekday.indexOf(dayOfWeek);
+    let d = weekday.indexOf(fistLetterUpperCase(dayOfWeek));
     let date = new Date();
     date.setDate(date.getDate() + (d - 1 - date.getDay() + 7) % 7 + 1);
     return date;

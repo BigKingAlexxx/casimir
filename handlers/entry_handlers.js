@@ -116,8 +116,7 @@ const EditEntryIntentHandler = {
                 else {
                     const query = logic.calcOpportunityValues(entryProperty, result[0]);
                     const newResult = await query_mongo.queryAndUpdate(query, 'Opportunities');
-                    console.log(JSON.stringify(newResult));
-                    speechText = `Der neue Wert beträgt jetzt ${entryPropertyValue}.`;
+                    speechText = `Ok, ich habe den Eintrag für ${companyName} geändert. Der neue Wert beträgt jetzt <say-as interpret-as='cardinal'>${entryPropertyValue}.</say-as>`;
                 }
                 speechText += ' Kann ich noch was für dich tun?'
             } catch (error) {

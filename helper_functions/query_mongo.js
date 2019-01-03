@@ -17,7 +17,7 @@ function insertIntoMongo(data, collectionName) {
             console.log(err);
         } else {
             var db = client.db('TestDB');
-            db.collection(collectionName).insert(data);
+            db.collection(collectionName).insertOne(data);
             client.close();
         }
     });
@@ -97,9 +97,10 @@ function queryInfoEmployee(firstName, lastName, object) {
 }
 
 function queryAppointment(userId, date) {
-    let query;
-    if (date) query = date;
+    let query; console.log(date)
+    if (date) query = new RegExp(logic.checkDateFormat(date) + '.*');
     else query = {$gte: logic.getDateString()};
+    console.log(query)
     return new Promise(function (resolve, reject) {
         MongoClient.connect(urlOnline.connectionString, urlOnline.options, function (err, client) {
             if (err) reject(err);

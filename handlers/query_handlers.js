@@ -379,22 +379,24 @@ const QueryAppointmentIntentHandler = {
                 let amountDone = 0;
                 let counter = 0;
 
-                if (sessionattributes.hasOwnProperty('LastIntent')) amountDone = sessionattributes.LastIntent.appointment.amountDone;
+                if (sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryAppointmentIntent') amountDone = sessionattributes.LastIntent.appointment.amountDone;
 
                 for (amountDone; amountDone < result.length; amountDone++) {
                     console.log("in for schleife result von 3 ist: " + JSON.stringify(result[amountDone]))
                     let i = result[amountDone];
                     if (dayOfWeek) {
                         console.log("Else dayOfWeek: " + dayOfWeek)
-                        if (logic.getDateString(logic.getNextDayOfWeekDate(dayOfWeek)) === i.date) {
+                        /*if (logic.getDateString(logic.getNextDayOfWeekDate(dayOfWeek)) === i.date) {
                             console.log("true hier bei dayofweek")
                             speechText += speech.getAppointmentSpeechText('dayOfWeek', i);
-                        }
+                        }*/
+                        speechText += speech.getAppointmentSpeechText('dayOfWeek', i);
                     } else if (date) {
                         console.log("Else Date")
-                        if (date === i.date) {
+                        /*if (date === i.date) {
                             speechText += speech.getAppointmentSpeechText('date', i);
-                        }
+                        }*/
+                        speechText += speech.getAppointmentSpeechText('date', i);
                     } else {
                         console.log("Else ALL")
                         speechText += speech.getAppointmentSpeechText('all', i);

@@ -1,12 +1,20 @@
 'use strict';
 const QueryHandlers = require('./query_handlers');
+const query_mongo = require('../helper_functions/query_mongo');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
     },
-    handle(handlerInput) {
-        const speechText = 'Hallo, guten Tag!';
+    async handle(handlerInput) {
+        const result = await query_mongo.queryMongoDB({amazon_user: handlerInput.requestEnvelope.session.user.userId}, 'Users');
+        let speechText;
+        if (result.length === 0) {
+            speechText = 'Hallo, willkommen bei Casimir! Hier kannst du Kontakte und Termine anlegen, Verkaufschancen abändern, Informationen zu Mitarbeitern' +
+                ', Kunden, aktuellen Projekten, oder Terminen in Erfahrung bringen. Sage zum Beispiel: Was sind meine nächsten Termine. Falls du Hilfe benötigst, kannst du jederzeit Hilfe sagen.';
+            query_mongo.insertIntoMongo({amazon_user: handlerInput.requestEnvelope.session.user.userId}, 'Users');
+        } else speechText = 'Hallo, guten Tag!';
+
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -25,18 +33,15 @@ const YesIntentHandler = {
         if (sessionattributes.LastIntent !== undefined && !sessionattributes.LastIntent.NoMoreInfos) {
             if (sessionattributes.LastIntent.name === 'QueryAppointmentIntent') {
                 return QueryHandlers.QueryAppointmentIntentHandler.handle(handlerInput);
-            }
-            else if (sessionattributes.LastIntent.name === 'QueryProjectIntent') {
+            } else if (sessionattributes.LastIntent.name === 'QueryProjectIntent') {
                 return QueryHandlers.MoreInfoIntentHandler.handle(handlerInput); // Kann ich hier sessionAttributes.LastIntent übergeben?
-            }
-            else if (sessionattributes.LastIntent.name === 'QueryPhoneIntent'
+            } else if (sessionattributes.LastIntent.name === 'QueryPhoneIntent'
                 || sessionattributes.LastIntent.name === 'QuerySalaryIntent'
                 || sessionattributes.LastIntent.name === 'QueryDateOfJoiningIntent'
                 || sessionattributes.LastIntent.name === 'QueryEmailIntent'
                 || sessionattributes.LastIntent.name === 'QueryInfoEmployeeIntent') {
                 speechText = sessionattributes.LastIntent.speechText;
-            }
-            else speechText = 'Ok, was möchtest du tun?'
+            } else speechText = 'Ok, was möchtest du tun?'
         } else {
             speechText = 'Ok, was möchtest du tun?';
         }
@@ -76,12 +81,12 @@ const HelpIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
     },
     handle(handlerInput) {
-        const speechText = 'Hier muss Alex noch was reinschreiben.';
-        const repromptText = 'Alex muss das hier noch programmieren.';
+        const speechText = 'Du kannst zum Beispiel sagen: Neuen Kontakt anlegen, neuen Termin anlegen, Verkaufschance ändern, gib mir Infos zu Mitarbeiter <say-as interpret-as="spell-out">XY</say-as>, ' +
+            'gib mir die Kunden mit dem höchsten Umsatz, wie glücklich sind meine Kunden, welche Projekte habe ich und welche Termine habe ich heute.';
 
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(repromptText)
+            .reprompt(speechText)
             .getResponse();
     }
 };
