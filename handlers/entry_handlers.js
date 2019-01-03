@@ -38,7 +38,7 @@ const NewContactIntentHandler = { //Noch Raumnummer und Abteilung unso einfügen
                 "firstName": logic.fistLetterUpperCase(firstName), "lastName": logic.fistLetterUpperCase(lastName), "companyName": companyName, "mobileNum": mobileNum, "email": emailAddress
             };
             query_mongo.insertIntoMongo(data, 'Contacts');
-            const speechText = `Ok ich habe ${firstName} ${lastName}, Firma ${companyName}, Nummer ${mobileNum}, E-Mail ${emailAddress} hinzugefügt. Kann ich noch was für dich tun?`;
+            const speechText = `Ok ich habe ${firstName} ${lastName}, Firma ${logic.spellOut(companyName)}, Nummer ${mobileNum}, E-Mail ${emailAddress} hinzugefügt. Kann ich noch was für dich tun?`;
 
             return handlerInput.responseBuilder
                 .speak(speechText)
@@ -64,7 +64,7 @@ const NewAppointmentIntentHandler = {
         var date = currentIntent.slots.AppointmentDate.value;
         var startTime = currentIntent.slots.AppointmentStartTime.value;
         var endTime = currentIntent.slots.AppointmentEndTime.value;
-        var place = currentIntent.slots.AppointmentPlace.value;
+        var place = currentIntent.slots.UserInputAppointmentPlace.value;
         var description = currentIntent.slots.AppointmentDescription.value;
 
         /* wenn ich nicht completed bin delegate ich ganz normal.
@@ -115,7 +115,7 @@ const EditEntryIntentHandler = {
                 else {
                     const query = logic.calcOpportunityValues(entryProperty, result[0]);
                     const newResult = await query_mongo.queryAndUpdate(query, 'Opportunities');
-                    speechText = `Ok, ich habe den Eintrag für ${companyName} geändert. Der neue Wert beträgt jetzt <say-as interpret-as='cardinal'>${entryPropertyValue}.</say-as>`;
+                    speechText = `Ok, ich habe den Eintrag ${entryPropertyName} für ${companyName} geändert. Der neue Wert beträgt jetzt <say-as interpret-as='cardinal'>${entryPropertyValue}.</say-as>`;
                 }
                 speechText += ' Kann ich noch was für dich tun?'
             } catch (error) {

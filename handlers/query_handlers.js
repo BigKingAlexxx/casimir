@@ -492,7 +492,8 @@ const QueryCustomersAggregateIntentHandler = {
                 console.log("Else")
                 speechText = 'Tut mir leid, ich habe das nicht verstanden.'
             }
-            speechText += " Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir mehr Infos, oder gib mir Infos zu Kunde eins.";
+            if (customerFeature !== 'glücklich') speechText += " Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir mehr Infos, oder gib mir Infos zu Kunde eins.";
+            else speechText += " Kann ich noch was für dich tun?";
             speechText = speechText.replaceAll(/&/gm, '&amp;');
             sessionattributes.LastIntent = currentIntent;
             sessionattributes.LastIntent.result = result;
@@ -608,13 +609,13 @@ const MoreInfoIntentHandler = {
                 let i = result[number];
                 speechText = `${i.name} ist Kunde seit ${i.customer_since} und bezieht das Produkt ${i.product}. Der Umsatz beträgt ${i.revenue.value.$numberDecimal}` +
                     ` ${i.revenue.currency} und der Kunde ist als ${i.satisfaction} eingestuft. Der Ansprechpartner ist ${i.contact.name}. `;
-            }
-            else {
+            } else {
                 for (let i of result) {
                     speechText += `${i.name} ist Kunde seit ${i.customer_since} und bezieht das Produkt ${i.product}. Der Umsatz beträgt ${i.revenue.value.$numberDecimal}` +
                         ` ${i.revenue.currency} und der Kunde ist als ${i.satisfaction} eingestuft. Der Ansprechpartner ist ${i.contact.name}. `;
                 }
             }
+            speechText += "Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir die Nummer oder E-Mail-Adresse des Ansprechpartners eins.";
             //sessionattributes.LastIntent = currentIntent;
         } else if (sessionattributes.hasOwnProperty('LastIntent') && (sessionattributes.LastIntent.name === 'QueryProjectIntent' || sessionattributes.LastIntent.name === 'MoreInfoIntent')) {
             const result = sessionattributes.LastIntent.result;
@@ -665,11 +666,11 @@ const MoreInfoIntentHandler = {
                     } else sessionattributes.LastIntent.NoMoreInfos = true;
                 }
             }
+            speechText += "Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir die Notiz.";
         }
         sessionattributes.LastIntent.amountDone++;
         if (!sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name !== 'QueryCustomersAggregateIntent') sessionattributes.LastIntent.NoMoreInfos = true;
         handlerInput.attributesManager.setSessionAttributes(sessionattributes);
-        speechText += "Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir die Notiz.";
         speechText = logic.spellOut(speechText);
         speechText = speechText.replace(/&/gm, '&amp;');
 

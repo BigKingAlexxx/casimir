@@ -58,13 +58,13 @@ function getEmployeeSpeechText(intent, result) {
 function getAppointmentSpeechText(slot, i) {
     let speechText = '';
     if (slot === 'dayOfWeek' || slot === 'date') {
-        if (i.place === 'nein' || undefined) {
+        if (i.place === 'weiter' && i.description !== 'weiter') {
             speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
                 ` und ${i.endTime}. Die Beschreibung lautet: ${i.description}. `
-        } else if (i.description === 'nein' || undefined) {
+        } else if (i.description === 'weiter' && i.place !== 'weiter') {
             speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
                 ` und ${i.endTime} in ${i.place}.`
-        } else if ((i.place === 'nein' || undefined) && (i.description === 'nein' || undefined)) {
+        } else if ((i.place === 'weiter') && (i.description === 'weiter')) {
             speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
                 ` und ${i.endTime}. `
         } else {
@@ -72,13 +72,13 @@ function getAppointmentSpeechText(slot, i) {
                 ` und ${i.endTime} in ${i.place}. Die Beschreibung lautet: ${i.description}. `
         }
     } else {
-        if (i.place === 'nein') {
+        if (i.place === 'weiter' && i.description !== 'weiter') {
             speechText += `Du hast den Termin <emphasis> ${i.name} </emphasis> am ${logic.getWeekDay(i.date)} den ${i.date} zwischen ${i.startTime}` +
                 ` und ${i.endTime}. Die Beschreibung lautet: ${i.description}. `
-        } else if (i.description === 'nein') {
+        } else if (i.description === 'weiter' && i.place !== 'weiter') {
             speechText += `Du hast den Termin <emphasis> ${i.name} </emphasis> am ${logic.getWeekDay(i.date)} den ${i.date} zwischen ${i.startTime}` +
                 ` und ${i.endTime} in ${i.place}. `
-        } else if (i.place === 'nein' && i.description === 'nein') {
+        } else if (i.place === 'weiter' && i.description === 'weiter') {
             speechText += `Du hast den Termin <emphasis> ${i.name} </emphasis> am ${logic.getWeekDay(i.date)} den ${i.date} zwischen ${i.startTime}` +
                 ` und ${i.endTime}. `
         } else {
