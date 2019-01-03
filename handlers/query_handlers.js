@@ -492,7 +492,7 @@ const QueryCustomersAggregateIntentHandler = {
                 console.log("Else")
                 speechText = 'Tut mir leid, ich habe das nicht verstanden.'
             }
-            speechText += " Kann ich noch was für dich tun?";
+            speechText += " Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir mehr Infos, oder gib mir Infos zu Kunde eins.";
             speechText = speechText.replaceAll(/&/gm, '&amp;');
             sessionattributes.LastIntent = currentIntent;
             sessionattributes.LastIntent.result = result;
@@ -532,7 +532,7 @@ const QueryProjectIntentHandler = {
                     }
                 } else speechText = `Du hast aktuell ein Projekt. Projekt <emphasis>${i.name}</emphasis>, Abschluss ist der ${i.end}.`;
             } else speechText = "Du hast keine aktuellen Projekte."
-            speechText += " Kann ich noch was für dich tun?"
+            speechText += " Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir mehr Infos, oder gib mir Infos zu Projekt eins."
             sessionattributes.LastIntent = currentIntent;
             sessionattributes.LastIntent.result = result;
             sessionattributes.LastIntent.amountDone = 0;
@@ -565,7 +565,7 @@ const QueryNoteIntentHandler = {
         if (sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryProjectIntent') {
             const result = sessionattributes.LastIntent.result;
             let amountDone = sessionattributes.LastIntent.amountDone;
-            speechText = `Die Notiz zum Projekt ${result[amountDone - 1].name} ist: ${result[amountDone - 1].notes}`;
+            speechText = `Die Notiz zum Projekt ${result[amountDone - 1].name} ist: ${result[amountDone - 1].notes}. Wenn du eine Notiz ergänzen möchtest, sage: Neue Notiz und nenne den Inhalt.`;
         }
 
         //handlerInput.attributesManager.setSessionAttributes(sessionattributes);
@@ -662,14 +662,14 @@ const MoreInfoIntentHandler = {
                             .reprompt(speechText)
                             .withShouldEndSession(false)
                             .getResponse();
-                    }
+                    } else sessionattributes.LastIntent.NoMoreInfos = true;
                 }
             }
         }
         sessionattributes.LastIntent.amountDone++;
         if (!sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name !== 'QueryCustomersAggregateIntent') sessionattributes.LastIntent.NoMoreInfos = true;
         handlerInput.attributesManager.setSessionAttributes(sessionattributes);
-        speechText += "Kann ich noch was für dich tun?";
+        speechText += "Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir die Notiz.";
         speechText = logic.spellOut(speechText);
         speechText = speechText.replace(/&/gm, '&amp;');
 

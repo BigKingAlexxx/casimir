@@ -28,8 +28,8 @@ function replaceEmailSymbols(string) {
 function replaceEmailNames(str, firstName, lastName, companyName) {
     str = str.replaceAll('vorname', firstName);
     str = str.replaceAll('nachname', lastName);
-    str = str.replaceAll('firmenname', companyName);
-
+    str = str.replaceAll('firmenname', companyName); console.log(companyName);
+    if (companyName === 'CAS Software AG') str = str.replaceAll(companyName, 'cas');
     return str.toLowerCase();
 }
 

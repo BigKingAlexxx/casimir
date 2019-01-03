@@ -69,7 +69,6 @@ const NoIntentHandler = {
 
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
             .withShouldEndSession(false)
             .getResponse();
     }
@@ -82,7 +81,7 @@ const HelpIntentHandler = {
     },
     handle(handlerInput) {
         const speechText = 'Du kannst zum Beispiel sagen: Neuen Kontakt anlegen, neuen Termin anlegen, Verkaufschance ändern, gib mir Infos zu Mitarbeiter <say-as interpret-as="spell-out">XY</say-as>, ' +
-            'gib mir die Kunden mit dem höchsten Umsatz, wie glücklich sind meine Kunden, welche Projekte habe ich und welche Termine habe ich heute.';
+            'gib mir die Kunden mit dem höchsten Umsatz, wie glücklich sind meine Kunden, welche Projekte habe ich, oder welche Termine habe ich heute.';
 
         return handlerInput.responseBuilder
             .speak(speechText)

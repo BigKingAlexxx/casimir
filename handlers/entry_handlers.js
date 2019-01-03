@@ -1,7 +1,6 @@
 'use strict';
 const logic = require('../helper_functions/logic');
 const koeln = require('../helper_functions/koeln');
-const phonem = require('talisman/phonetics/german/phonem');
 const query_mongo = require('../helper_functions/query_mongo');
 
 const NewContactIntentHandler = { //Noch Raumnummer und Abteilung unso einfügen, dass man unterscheiden kann wenn Doppelte gibt.
@@ -35,11 +34,11 @@ const NewContactIntentHandler = { //Noch Raumnummer und Abteilung unso einfügen
 
             mobileNum = logic.replaceNumberLiterals(mobileNum);
             var data = {
-                cologne: { first: koeln(firstName), last: koeln(lastName) }, phonem: { first: phonem(firstName), last: phonem(lastName) },
-                "firstName": firstName, "lastName": lastName, "companyName": companyName, "mobileNum": mobileNum, "email": emailAddress
+                cologne: { first: koeln(firstName), last: koeln(lastName) },
+                "firstName": logic.fistLetterUpperCase(firstName), "lastName": logic.fistLetterUpperCase(lastName), "companyName": companyName, "mobileNum": mobileNum, "email": emailAddress
             };
             query_mongo.insertIntoMongo(data, 'Contacts');
-            const speechText = 'Ok ich habe ' + firstName + ' ' + lastName + ' hinzugefügt. Kann ich noch was für dich tun?';
+            const speechText = `Ok ich habe ${firstName} ${lastName}, Firma ${companyName}, Nummer ${mobileNum}, E-Mail ${emailAddress} hinzugefügt. Kann ich noch was für dich tun?`;
 
             return handlerInput.responseBuilder
                 .speak(speechText)
