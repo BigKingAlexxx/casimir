@@ -38,7 +38,7 @@ const NewContactIntentHandler = { //Noch Raumnummer und Abteilung unso einfügen
                 "firstName": logic.fistLetterUpperCase(firstName), "lastName": logic.fistLetterUpperCase(lastName), "companyName": companyName, "mobileNum": mobileNum, "email": emailAddress
             };
             query_mongo.insertIntoMongo(data, 'Contacts');
-            const speechText = `Ok ich habe ${firstName} ${lastName}, Firma ${logic.spellOut(companyName)}, Nummer ${mobileNum}, E-Mail ${emailAddress} hinzugefügt. Kann ich noch was für dich tun?`;
+            const speechText = `Ok ich habe ${firstName} ${lastName}, Firma ${logic.spellOut(companyName)}, Nummer <say-as interpret-as="digits">${mobileNum}</say-as>, E-Mail ${emailAddress} hinzugefügt. Kann ich noch was für dich tun?`;
 
             return handlerInput.responseBuilder
                 .speak(speechText)
@@ -158,10 +158,20 @@ const AddNoteIntentHandler = {
 
         if (sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryProjectIntent') {
             const result = sessionattributes.LastIntent.result;
-            const amountDone = sessionattributes.LastIntent.amountDone;
-            query_mongo.updateNotes(result[amountDone - 1].name, note).then().catch(console.error);
-            speechText = `Ok, ich habe die Notiz ${note} hinzugefügt.`;
+
+            if (sessionattributes.LastIntent.hasOwnProperty('MoreInfoIntentNumber')) {
+                const projectNumber = sessionattributes.LastIntent.MoreInfoIntentNumber;
+                query_mongo.updateNotes(result[projectNumber - 1].name, note).then().catch(console.error);
+                speechText = `Ok, ich habe die Notiz ${note} hinzugefügt.`;
+            }
+
+            if (sessionattributes.LastIntent.hasOwnProperty('amountDone')) {
+                const amountDone = sessionattributes.LastIntent.amountDone;
+                query_mongo.updateNotes(result[amountDone - 1].name, note).then().catch(console.error);
+                speechText = `Ok, ich habe die Notiz ${note} hinzugefügt.`;
+            }
         }
+
         speechText += " Kann ich noch was für dich tun?"
 
         //handlerInput.attributesManager.setSessionAttributes(sessionattributes);

@@ -361,13 +361,13 @@ const QueryAppointmentIntentHandler = {
             let result;
             if (dayOfWeek) {
                 result = await query_mongo.queryAppointment(userId, logic.getDateString(logic.getNextDayOfWeekDate(dayOfWeek)));
-                if (!(sessionattributes.hasOwnProperty('LastIntent'))) {
+                if (!(sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryAppointmentIntent')) {
                     if (result.length === 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ein Termin. `;
                     else if (result.length > 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ${result.length} Termine. `;
                 }
             } else if (date) {
                 result = await query_mongo.queryAppointment(userId, date);
-                if (!(sessionattributes.hasOwnProperty('LastIntent'))) {
+                if (!(sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryAppointmentIntent')) {
                     if (result.length === 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ein Termin. `;
                     else if (result.length > 1 && date.length === 10) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ${result.length} Termine. `;
                     else if (result.length > 1 && date.length === 7) speechText = `Im ${logic.getMonthLiteral(date)} hast du ${result.length} Termine. `;
@@ -567,9 +567,14 @@ const QueryNoteIntentHandler = {
 
         if (sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryProjectIntent') {
             const result = sessionattributes.LastIntent.result;
-            let amountDone = sessionattributes.LastIntent.amountDone;
-            speechText = `Die Notiz zum Projekt ${result[amountDone - 1].name} ist: ${result[amountDone - 1].notes}. 
-            Wenn du eine Notiz ergänzen möchtest, sage: Neue Notiz und nenne den Inhalt direkt danach.`;
+            if (sessionattributes.LastIntent.hasOwnProperty('MoreInfoIntentNumber')) {
+                let projectNumber = sessionattributes.LastIntent.MoreInfoIntentNumber;
+                speechText = `Die Notiz zum Projekt ${result[projectNumber - 1].name} ist: ${result[projectNumber - 1].notes}. Wenn du eine Notiz ergänzen möchtest, sage: Neue Notiz und nenne den Inhalt direkt danach.`;
+            }
+            if (sessionattributes.LastIntent.hasOwnProperty('amountDone')) {
+                let amountDone = sessionattributes.LastIntent.amountDone;
+                speechText = `Die Notiz zum Projekt ${result[amountDone - 1].name} ist: ${result[amountDone - 1].notes}. Wenn du eine Notiz ergänzen möchtest, sage: Neue Notiz und nenne den Inhalt direkt danach.`;
+            }
         }
 
         //handlerInput.attributesManager.setSessionAttributes(sessionattributes);
@@ -594,7 +599,7 @@ const MoreInfoIntentHandler = {
         let speechText = '';
         let category;
         let number;
-        console.log(JSON.stringify(sessionattributes))
+
         if (currentIntent.name !== 'AMAZON.YesIntent') {
             category = logic.getSlotValue(handlerInput, 'MoreInfoIntentCategory');
             number = logic.getSlotValue(handlerInput, 'MoreInfoIntentNumber');
@@ -637,6 +642,7 @@ const MoreInfoIntentHandler = {
                             `${i.department}. `;
                     }
                     sessionattributes.LastIntent.NoMoreInfos = true;
+                    sessionattributes.LastIntent.MoreInfoIntentNumber = number;
                 } else speechText = `${number} liegt außerhalb des zulässigen Bereichs. Bitte wähle zwischen 1 und <say-as interpret-as='cardinal'>${result.length}</say-as>. `;
             } else {
                 let amountDone = sessionattributes.LastIntent.amountDone;
