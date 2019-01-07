@@ -369,12 +369,14 @@ const QueryAppointmentIntentHandler = {
                 result = await query_mongo.queryAppointment(userId, date);
                 if (!(sessionattributes.hasOwnProperty('LastIntent'))) {
                     if (result.length === 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ein Termin. `;
-                    else if (result.length > 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ${result.length} Termine. `;
+                    else if (result.length > 1 && date.length === 10) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ${result.length} Termine. `;
+                    else if (result.length > 1 && date.length === 7) speechText = `Im ${logic.getMonthLiteral(date)} hast du ${result.length} Termine. `;
+                    else speechText = `Du hast ${result.length} Termine. `;
                 }
             } else result = await query_mongo.queryAppointment(userId);
 
             if (result.length == 0 || logic.isEmpty(result[0])) { // https://en.wiktionary.org/wiki/Wiktionary:Main_Page --> für Phoneme
-                speechText = 'Tut mir leid, ich konnte zu deiner Benutzer-<phoneme alphabet="ipa" ph="aɪˈdiː">ID</phoneme> keine Termine finden.';
+                speechText = 'Tut mir leid, ich konnte zu deiner Benutzer-<phoneme alphabet="ipa" ph="aɪˈdiː">ID</phoneme> beziehungsweise zum angegebenen Datum keine Termine finden.';
             } else {
                 let amountDone = 0;
                 let counter = 0;
@@ -566,7 +568,8 @@ const QueryNoteIntentHandler = {
         if (sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryProjectIntent') {
             const result = sessionattributes.LastIntent.result;
             let amountDone = sessionattributes.LastIntent.amountDone;
-            speechText = `Die Notiz zum Projekt ${result[amountDone - 1].name} ist: ${result[amountDone - 1].notes}. Wenn du eine Notiz ergänzen möchtest, sage: Neue Notiz und nenne den Inhalt.`;
+            speechText = `Die Notiz zum Projekt ${result[amountDone - 1].name} ist: ${result[amountDone - 1].notes}. 
+            Wenn du eine Notiz ergänzen möchtest, sage: Neue Notiz und nenne den Inhalt direkt danach.`;
         }
 
         //handlerInput.attributesManager.setSessionAttributes(sessionattributes);
