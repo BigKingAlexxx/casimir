@@ -494,7 +494,7 @@ const QueryCustomersAggregateIntentHandler = {
                 console.log("Else")
                 speechText = 'Tut mir leid, ich habe das nicht verstanden.'
             }
-            if (customerFeature !== 'glücklich') speechText += " Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir mehr Infos, oder gib mir Infos zu Kunde eins.";
+            if (customerFeature !== 'glücklich') speechText += " Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir mehr Infos, oder gib mir Infos zu Kunde X.";
             else speechText += " Kann ich noch was für dich tun?";
             speechText = speechText.replaceAll(/&/gm, '&amp;');
             sessionattributes.LastIntent = currentIntent;
@@ -535,7 +535,7 @@ const QueryProjectIntentHandler = {
                     }
                 } else speechText = `Du hast aktuell ein Projekt. Projekt <emphasis>${i.name}</emphasis>, Abschluss ist der ${i.end}.`;
             } else speechText = "Du hast keine aktuellen Projekte."
-            speechText += " Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir mehr Infos, oder gib mir Infos zu Projekt eins."
+            speechText += " Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir mehr Infos, oder gib mir Infos zu Projekt X."
             sessionattributes.LastIntent = currentIntent;
             sessionattributes.LastIntent.result = result;
             sessionattributes.LastIntent.amountDone = 0;
@@ -570,8 +570,7 @@ const QueryNoteIntentHandler = {
             if (sessionattributes.LastIntent.hasOwnProperty('MoreInfoIntentNumber')) {
                 let projectNumber = sessionattributes.LastIntent.MoreInfoIntentNumber;
                 speechText = `Die Notiz zum Projekt ${result[projectNumber - 1].name} ist: ${result[projectNumber - 1].notes}. Wenn du eine Notiz ergänzen möchtest, sage: Neue Notiz und nenne den Inhalt direkt danach.`;
-            }
-            if (sessionattributes.LastIntent.hasOwnProperty('amountDone')) {
+            } else if (sessionattributes.LastIntent.hasOwnProperty('amountDone')) {
                 let amountDone = sessionattributes.LastIntent.amountDone;
                 speechText = `Die Notiz zum Projekt ${result[amountDone - 1].name} ist: ${result[amountDone - 1].notes}. Wenn du eine Notiz ergänzen möchtest, sage: Neue Notiz und nenne den Inhalt direkt danach.`;
             }
@@ -613,17 +612,26 @@ const MoreInfoIntentHandler = {
         if (sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryCustomersAggregateIntent') {
             const result = sessionattributes.LastIntent.result;
             if (category && number) {
-                number--;
-                let i = result[number];
-                speechText = `${i.name} ist Kunde seit ${i.customer_since} und bezieht das Produkt ${i.product}. Der Umsatz beträgt ${i.revenue.value.$numberDecimal}` +
-                    ` ${i.revenue.currency} und der Kunde ist als ${i.satisfaction} eingestuft. Der Ansprechpartner ist ${i.contact.name}. `;
+                if (number > 0 && number <= result.length) {
+                    number--;
+                    let i = result[number];
+                    speechText = `${i.name} ist Kunde seit ${i.customer_since} und bezieht das Produkt ${i.product}. Der Umsatz beträgt ${i.revenue.value.$numberDecimal}` +
+                        ` ${i.revenue.currency} und der Kunde ist als ${i.satisfaction} eingestuft. Der Ansprechpartner ist ${i.contact.name}. `;
+                } else {
+                    speechText = `${number} ist außerhalb des gültigen Bereichs. Bitte wähle zwischen eins und ${result.length}.`;
+                    return handlerInput.responseBuilder
+                        .addElicitSlotDirective('MoreInfoIntentNumber')
+                        .speak(speechText)
+                        .reprompt(speechText)
+                        .getResponse();
+                }
             } else {
                 for (let i of result) {
                     speechText += `${i.name} ist Kunde seit ${i.customer_since} und bezieht das Produkt ${i.product}. Der Umsatz beträgt ${i.revenue.value.$numberDecimal}` +
                         ` ${i.revenue.currency} und der Kunde ist als ${i.satisfaction} eingestuft. Der Ansprechpartner ist ${i.contact.name}. `;
                 }
             }
-            speechText += "Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir die Nummer oder E-Mail-Adresse des Ansprechpartners eins.";
+            speechText += "Kann ich noch was für dich tun? Du kannst zum Beispiel sagen: Gib mir die Nummer oder E-Mail-Adresse des Ansprechpartners X.";
             //sessionattributes.LastIntent = currentIntent;
         } else if (sessionattributes.hasOwnProperty('LastIntent') && (sessionattributes.LastIntent.name === 'QueryProjectIntent' || sessionattributes.LastIntent.name === 'MoreInfoIntent')) {
             const result = sessionattributes.LastIntent.result;
