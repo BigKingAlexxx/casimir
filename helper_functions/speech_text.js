@@ -55,21 +55,37 @@ function getEmployeeSpeechText(intent, result) {
     return speechText;
 }
 
-function getAppointmentSpeechText(slot, i) {
+function getAppointmentSpeechText(slot, i, date) {
     let speechText = '';
     if (slot === 'dayOfWeek' || slot === 'date') {
-        if (i.place === 'weiter' && i.description !== 'weiter') {
-            speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
-                ` und ${i.endTime}. Die Beschreibung lautet: ${i.description}. `
-        } else if (i.description === 'weiter' && i.place !== 'weiter') {
-            speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
-                ` und ${i.endTime} in ${i.place}.`
-        } else if ((i.place === 'weiter') && (i.description === 'weiter')) {
-            speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
-                ` und ${i.endTime}. `
+        if (date.length === 7) {
+            if (i.place === 'weiter' && i.description !== 'weiter') {
+                speechText += `Termin <emphasis> ${i.name} </emphasis> am ${i.date} zwischen ${i.startTime}` +
+                    ` und ${i.endTime}. Die Beschreibung lautet: ${i.description}. `
+            } else if (i.description === 'weiter' && i.place !== 'weiter') {
+                speechText += `Termin <emphasis> ${i.name} </emphasis> am ${i.date} zwischen ${i.startTime}` +
+                    ` und ${i.endTime} in ${i.place}.`
+            } else if ((i.place === 'weiter') && (i.description === 'weiter')) {
+                speechText += `Termin <emphasis> ${i.name} </emphasis> am ${i.date} zwischen ${i.startTime}` +
+                    ` und ${i.endTime}. `
+            } else {
+                speechText += `Termin <emphasis> ${i.name} </emphasis> am ${i.date} zwischen ${i.startTime}` +
+                    ` und ${i.endTime} in ${i.place}. Die Beschreibung lautet: ${i.description}. `
+            }
         } else {
-            speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
-                ` und ${i.endTime} in ${i.place}. Die Beschreibung lautet: ${i.description}. `
+            if (i.place === 'weiter' && i.description !== 'weiter') {
+                speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
+                    ` und ${i.endTime}. Die Beschreibung lautet: ${i.description}. `
+            } else if (i.description === 'weiter' && i.place !== 'weiter') {
+                speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
+                    ` und ${i.endTime} in ${i.place}.`
+            } else if ((i.place === 'weiter') && (i.description === 'weiter')) {
+                speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
+                    ` und ${i.endTime}. `
+            } else {
+                speechText += `Termin <emphasis> ${i.name} </emphasis> zwischen ${i.startTime}` +
+                    ` und ${i.endTime} in ${i.place}. Die Beschreibung lautet: ${i.description}. `
+            }
         }
     } else {
         if (i.place === 'weiter' && i.description !== 'weiter') {

@@ -353,8 +353,11 @@ const QueryAppointmentIntentHandler = {
             dayOfWeek = logic.getSlotValue(handlerInput, 'DayOfWeek');
             date = logic.getSlotValue(handlerInput, 'Date');
         } else {
-            dayOfWeek = sessionattributes.LastIntent.slots.DayOfWeek.value;
-            date = sessionattributes.LastIntent.slots.Date.value;
+            let slots = sessionattributes.LastIntent.hasOwnProperty("slots") ? sessionattributes.LastIntent.slots : "";
+            if (slots) {
+                dayOfWeek = slots.hasOwnProperty("DayOfWeek") ? slots.DayOfWeek.value : "";
+                date = slots.hasOwnProperty("Date") ? slots.Date.value : "";
+            }
         }
 
         try {
@@ -365,12 +368,13 @@ const QueryAppointmentIntentHandler = {
                     if (result.length === 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ein Termin. `;
                     else if (result.length > 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ${result.length} Termine. `;
                 }
-            } else if (date) {
+            } else if (date) { console.log("date case")
                 result = await query_mongo.queryAppointment(userId, date);
                 if (!(sessionattributes.hasOwnProperty('LastIntent') && sessionattributes.LastIntent.name === 'QueryAppointmentIntent')) {
                     if (result.length === 1) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ein Termin. `;
                     else if (result.length > 1 && date.length === 10) speechText = `Am ${logic.getWeekDay(result[0].date)} den ${result[0].date} hast du ${result.length} Termine. `;
-                    else if (result.length > 1 && date.length === 7) speechText = `Im ${logic.getMonthLiteral(date)} hast du ${result.length} Termine. `;
+                    else if (result.length > 1 && date.length === 7 && !(date.includes("W"))) speechText = `Im ${logic.getMonthLiteral(date)} hast du ${result.length} Termine. `;
+                    else if (result.length > 1 && date.includes("W")) speechText = `In Kalenderwoche ${date.charAt(date.length - 1)} hast du ${result.length} Termine. `;
                     else speechText = `Du hast ${result.length} Termine. `;
                 }
             } else result = await query_mongo.queryAppointment(userId);
@@ -392,13 +396,13 @@ const QueryAppointmentIntentHandler = {
                             console.log("true hier bei dayofweek")
                             speechText += speech.getAppointmentSpeechText('dayOfWeek', i);
                         }*/
-                        speechText += speech.getAppointmentSpeechText('dayOfWeek', i);
+                        speechText += speech.getAppointmentSpeechText('dayOfWeek', i, date);
                     } else if (date) {
                         console.log("Else Date")
                         /*if (date === i.date) {
                             speechText += speech.getAppointmentSpeechText('date', i);
                         }*/
-                        speechText += speech.getAppointmentSpeechText('date', i);
+                        speechText += speech.getAppointmentSpeechText('date', i, date);
                     } else {
                         console.log("Else ALL")
                         speechText += speech.getAppointmentSpeechText('all', i);

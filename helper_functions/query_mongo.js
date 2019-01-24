@@ -97,29 +97,53 @@ function queryInfoEmployee(firstName, lastName, object) {
 }
 
 function queryAppointment(userId, date) {
-    let query; console.log(date)
-    if (date) query = new RegExp(logic.checkDateFormat(date) + '.*');
-    else query = {$gte: logic.getDateString()};
-    console.log(query)
+    let isWeek = date && date.includes("W") ? true: false;
+    let query;
+    if (isWeek) {
+        date = logic.checkDateFormat(date);
+        query = { $and: [{date: {$gte: logic.getDateString(date)}}, {date: {$lte: logic.getDateString(date.addDays(7))}}]};
+    } else {
+        console.log(date);
+        if (date) query = new RegExp(logic.checkDateFormat(date) + '.*');
+        else query = {$gte: logic.getDateString()};
+        console.log(query)
+    }
     return new Promise(function (resolve, reject) {
         MongoClient.connect(urlOnline.connectionString, urlOnline.options, function (err, client) {
             if (err) reject(err);
             else {
                 var db = client.db('TestDB');
-                db.collection('Appointments').find({userId: userId, date: query}, {
-                    projection: {
-                        _id: 0,
-                        userId: 0
-                    }
-                }).toArray(function (err, result) {
-                    if (err) {
-                        console.log(err);
-                        reject(err);
-                    } else {
-                        client.close();
-                        resolve(result);
-                    }
-                });
+                if (isWeek) {
+                    db.collection('Appointments').find({userId: userId, $and: query.$and}, {
+                        projection: {
+                            _id: 0,
+                            userId: 0
+                        }
+                    }).toArray(function (err, result) {
+                        if (err) {
+                            console.log(err);
+                            reject(err);
+                        } else {
+                            client.close();
+                            resolve(result);
+                        }
+                    });
+                } else {
+                    db.collection('Appointments').find({userId: userId, date: query}, {
+                        projection: {
+                            _id: 0,
+                            userId: 0
+                        }
+                    }).toArray(function (err, result) {
+                        if (err) {
+                            console.log(err);
+                            reject(err);
+                        } else {
+                            client.close();
+                            resolve(result);
+                        }
+                    });
+                }
             }
         });
     });

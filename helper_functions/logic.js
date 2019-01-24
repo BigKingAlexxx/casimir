@@ -167,6 +167,12 @@ function getMonthLiteral(date) {
     return monthNames[d.getMonth()];
 }
 
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
 function getDateOfISOWeek(w, y) {
     var simple = new Date(y, 0, 1 + (w - 1) * 7);
     var dow = simple.getDay();
@@ -196,7 +202,7 @@ function checkDateFormat(date) {
 
     if (date.length === 4) {
         return date;
-    } else if (date.length === 7) {
+    } else if (date.length === 7 && !(date.includes("W"))) {
         //return getMonthLiteral(date) + " " + new Date(date).getFullYear();
         return date;
     } else if (date.length === 10 && !date.includes("X")) {
@@ -204,7 +210,7 @@ function checkDateFormat(date) {
     } else if (date.includes("W")) {
         let week = date.substring(date.indexOf("W") + 1, date.length);
         let year = date.substring(0, 4);
-        return getDateString(getDateOfISOWeek(week, year));
+        return getDateOfISOWeek(week, year);
     } else if (date.includes("X")) {
         let year = date.substring(0, 4);
         return year;
