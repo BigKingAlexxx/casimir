@@ -79,7 +79,7 @@ const NewAppointmentIntentHandler = {
             var data = { "userId": userId, "name": name, "date": date, "startTime": startTime, "endTime": endTime, "place": place, "description": description };
             query_mongo.insertIntoMongo(data, 'Appointments');
 
-            const speechText = 'Ok ich habe den Termin' + name + ' am ' + date + ' von ' + startTime + ' bis ' + endTime + ' hinzugefügt. Kann ich noch was für dich tun?';
+            const speechText = 'Ok ich habe den Termin ' + name + ' am ' + date + ' von ' + startTime + ' bis ' + endTime + ' hinzugefügt. Kann ich noch was für dich tun?';
 
             return handlerInput.responseBuilder
                 .speak(speechText)
