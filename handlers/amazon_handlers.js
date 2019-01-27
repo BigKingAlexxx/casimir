@@ -14,7 +14,7 @@ const LaunchRequestHandler = {
                 ', Kunden, aktuellen Projekten, oder Terminen in Erfahrung bringen. Sage zum Beispiel: Was sind meine nächsten Termine. ' +
                 'Falls du Hilfe benötigst, kannst du jederzeit Hilfe sagen. Was möchtest du tun?';
             query_mongo.insertIntoMongo({amazon_user: handlerInput.requestEnvelope.session.user.userId}, 'Users');
-        } else speechText = 'Hallo, guten Tag! Was möchtest du tun?';
+        } else speechText = 'Hallo, willkommen bei Casimir! Was möchtest du tun?';
 
         return handlerInput.responseBuilder
             .speak(speechText)
