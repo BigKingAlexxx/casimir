@@ -46,23 +46,6 @@ function fistLetterUpperCase(string) {
     return string;
 }
 
-/* function replaceNumberLiterals(string) {
-    var wordCount = getWordCount(string);
-    for (var j = 0; j < wordCount; j++) {
-        for (var i = 0; i < numberLiterals.length; i++) {
-            string = string.replace(numberLiterals[i].wort, numberLiterals[i].wert);
-        }
-    }
-    string = string.replace(/\s/g, "");
-    return string;
-} */
-
-/* function replaceNumberLiterals(string) {
-    for (let i of numberLiterals) {
-        if (i.wort === string) return i.wert;
-    }
-} */
-
 function replaceNumberLiterals(string) {
     let arr = string.split(" ");
     let result = '';
@@ -129,7 +112,8 @@ function getNextDayOfWeekDate(dayOfWeek) {
 }
 
 /**
- * @param {String} date Das Datum 
+ * @param {Date} date Das Datum.
+ * @return {String} Das Datum konvertiert in das ISO 8601 Format.
  */
 function getDateString(date) {
     let today = new Date(date || new Date());
@@ -148,16 +132,20 @@ function getDateString(date) {
     return today;
 }
 
+/**
+ * @param {Date} date Das Datum.
+ * @return {int} Der Tag im Monat.
+ */
 function getDaysInMonth(date) {
     let year = date.substring(0, 4);
     let month = date.substring(5, date.length);
-    // Here January is 1 based
-    //Day 0 is the last day in the previous month
     return new Date(year, month, 0).getDate();
-    // Here January is 0 based
-    // return new Date(year, month+1, 0).getDate();
 };
 
+/**
+ * @param {Date} date Das Datum.
+ * @return {String} Der Monat des Datums.
+ */
 function getMonthLiteral(date) {
     let year = date.substring(0, 4);
     let month = date.substring(5, 7);
@@ -173,6 +161,11 @@ Date.prototype.addDays = function(days) {
     return date;
 }
 
+/**
+ * @param {String} w Die Woche.
+ * @param {int} y Das Jahr.
+ * @return {String} Das Datum des ersten Tags in der Woche.
+ */
 function getDateOfISOWeek(w, y) {
     var simple = new Date(y, 0, 1 + (w - 1) * 7);
     var dow = simple.getDay();
@@ -184,26 +177,15 @@ function getDateOfISOWeek(w, y) {
     return ISOweekStart;
 }
 
+/**
+ * Das Datum aus dem Slot wird in ein Datum zur Weiterverarbeitung umgewandelt.
+ * @param {String} date Das Datum.
+ * @return {String} Das Datum.
+ */
 function checkDateFormat(date) {
-    // Januar -> 2019-01
-    // letzten Monat -> 2018-11
-    // morgen -> 2018-12-18
-    // letzte Woche -> 2018-W50
-    // vor fünf Tagen -> 2018-12-12
-    // erster Januar zwei tausend -> 2000-01-01
-    // letztes Jahr -> 2017
-    // zwei tausend achtzehn -> 2018-XX-XX
-
-    // if length 4
-    // if length 7 
-    // if length 10
-    // if includes "W"
-    // if includes "X"
-
     if (date.length === 4) {
         return date;
     } else if (date.length === 7 && !(date.includes("W"))) {
-        //return getMonthLiteral(date) + " " + new Date(date).getFullYear();
         return date;
     } else if (date.length === 10 && !date.includes("X")) {
         return date;
@@ -340,7 +322,6 @@ module.exports = {
     concatName,
     fistLetterUpperCase,
     replaceNumberLiterals,
-    separateFirstLastName,
     getWeekDay,
     getNextDayOfWeekDate,
     getDateString,

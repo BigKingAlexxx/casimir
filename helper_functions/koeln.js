@@ -1,3 +1,7 @@
+/*
+    Nachimplementierung der Kölner Phonetik aus dem dazugehörenden Wikipedia-Artikel.
+ */
+
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
@@ -22,7 +26,6 @@ module.exports = function (input) {
         succ = n + 1;
         cp = input.charAt(pred);
         cs = input.charAt(succ);
-        //console.log(char)
         switch (char) {
             case 'a':
             case 'e':
@@ -98,43 +101,18 @@ module.exports = function (input) {
                 console.log("AMANA");
                 break;
         }
-        //console.log('Schleifendurchgang ' + n + ': ' + result + " " + char);
-
         n++;
     }
 
-    //console.log('For Schleife 1: ' + result);
     for (let i = 0; i < result.length - 1; i++) {
         if (result.charAt(i) === result.charAt(i + 1)) {
             result = replaceAt(result, i, '');
         }
     }
 
-    //console.log('For Schleife 2: ' + result)
-    //console.log(result.length)
     for (let i = 0; i < result.length; i++) {
         if (result.charAt(i) === '0' && i > 0) result = replaceAt(result, i, '');
     }
 
     return result;
 }
-
-
-
-
-
-
-/* console.log('Ergebnis für hill cf skye: ' + col('hills cf skye'));
-console.log('Ergebnis für hillcfskye: ' + col('hillscfskye'));
-console.log('Ergebnis für Zylowski: ' + col('Zylowski'));
-console.log('Ergebnis für I lovsky: ' + col('I lovsky'));
- */
-
-/*  console.log(col("Felic"))
- console.log(col("Herr"))
- console.log(col("Zylowski"))
- console.log(col("Zeimet"))
- console.log(col("Görlich"))
- console.log(col("Felix"))
- console.log(col("Felik"))
- */
