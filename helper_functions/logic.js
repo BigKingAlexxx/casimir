@@ -259,6 +259,12 @@ function getSlotID(handlerInput, slot) {
     return '';
 }
 
+/**
+ *
+ * @param property Eigenschaft
+ * @param entry Eintrag
+ * @returns {query} Query-Objekt mit aktualisierten Werten.
+ */
 function calcOpportunityValues(property, entry) {
     let query;
     switch (property.id) {
@@ -309,6 +315,11 @@ function calcOpportunityValues(property, entry) {
     return query;
 }
 
+/**
+ * Zur Aussprache von CAS.
+ * @param str
+ * @returns {*}
+ */
 function spellOut(str) {
     if (str.includes('CAS')) {
         str = str.replace(/CAS/gm, '<say-as interpret-as="spell-out">CAS</say-as>');

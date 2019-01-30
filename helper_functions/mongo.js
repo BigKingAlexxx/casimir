@@ -1,4 +1,9 @@
 'use strict';
+
+/*
+    Diese JS wird nicht benutzt.
+ */
+
 const Promise = require('promise');
 const MongoClient = require('mongodb').MongoClient;
 const urlOnline = {

@@ -9,14 +9,14 @@ const MongoClient = require('mongodb').MongoClient;
 const urlOnline = {
     connectionString: "mongodb://admin:Software1@18.203.81.194:27017/admin",
     options: {useNewUrlParser: true}
-};
+}; // Hier die Daten anpassen, falls neuer Server benutzt wird.
 
 function insertIntoMongo(data, collectionName) {
     MongoClient.connect(urlOnline.connectionString, urlOnline.options, function (err, client) {
         if (err) {
             console.log(err);
         } else {
-            var db = client.db('TestDB');
+            var db = client.db('TestDB'); // Name der DataBase
             db.collection(collectionName).insertOne(data);
             client.close();
         }
@@ -194,18 +194,6 @@ function queryCustomersAggregate(number, ranking, customerFeature, startDate, en
                     client.close();
                     resolve(Promise.all(promises));
                 } else if (startDate && endDate === '') {
-                    /*db.collection('Customers').find({
-                        $and: [{customer_since: {$gte: startDate + '-01'}},
-                            {customer_since: {$lte: startDate + '-' + logic.getDaysInMonth(startDate)}}]
-                    }, {projection: {}}).sort({customer_since: 1}).toArray(function (err, result) {
-                        if (err) {
-                            console.log(err);
-                            reject(err);
-                        } else {
-                            client.close();
-                            resolve(result);
-                        }
-                    });*/
                     startDate = logic.checkDateFormat(startDate);
                     db.collection('Customers').find({
                         customer_since: new RegExp(startDate + '.*')
